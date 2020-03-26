@@ -1,0 +1,31 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: cluster-resource-task
+spec:
+  inputs:
+    params:
+      - name: url
+        description: host url to master node
+        type: string
+      - name: username
+        description: username which has access to cluster
+        type: string
+      - name: password
+        description: used by the cluster for basic auth
+        type: string
+  steps:
+    - name: write
+      image: quay.io/diagrawa/kubeconfigwriter:v1
+      script: |
+        echo $SECRET_TOKEN
+      env:
+        - name: SECRET_TOKEN
+          valueFrom:
+            secretKeyRef:
+              name: cluster-resource-secret
+              key: token
+    - name: get
+      image: quay.io/openshift/origin-cli:latest
+      script: |
+        echo hi
