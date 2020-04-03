@@ -1,0 +1,20 @@
+apiVersion: tekton.dev/v1alpha1
+kind: Task
+metadata:
+  name: test-task
+spec:
+  inputs:
+    params:
+      - name: kubeconfigfile
+        description: location of the file
+        type: string
+  steps:
+    - name: get
+      image: quay.io/openshift/origin-cli:latest
+      script: |
+        export KUBECONFIG="$(inputs.params.kubeconfigfile)"
+        oc config view
+        oc whoami --show-server
+        oc get pods
+
+

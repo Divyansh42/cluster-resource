@@ -1,31 +1,75 @@
 apiVersion: tekton.dev/v1alpha1
 kind: Task
 metadata:
-  name: cluster-resource-task
+  name: cluster-resource
 spec:
   inputs:
     params:
+      - name: name
+        description: name of the cluster
+        type: string
+      - name: type
+        description: type of the resource
+        type: string
+        default: cluster
       - name: url
-        description: host url to master node
+        description: address of the cluster
         type: string
       - name: username
-        description: username which has access to cluster
+        description: username for basic authentication to the cluster
         type: string
       - name: password
-        description: used by the cluster for basic auth
+        description: password for basic authentication to the cluster
         type: string
+        default: ""
+      - name: cadata
+        description: contains PEM-encoded certificate authority certificates
+        type: string
+        default: ""
+      - name: clientkeydata
+        description: contains PEM-encoded data from a client key file for TLS
+        type: string
+        default: ""
+      - name: clientcertificatedata
+        description: contains PEM-encoded data from a client cert file for TLS
+        type: string
+        default: ""
+      - name: namespace
+        description: default namespace to use on unspecified requests
+        type: string
+        default: ""
+      - name: token
+        description: bearer token for authentication to the cluster
+        type: string
+        default: ""
+      - name: insecure
+        description: to indicate server should be accessed without verifying the TLS certificate
+        type: string
+        default: "true"
+  results:
+    - name: kubeconfigfile
+      description: location of the kubeconfig file
   steps:
     - name: write
-      image: quay.io/diagrawa/kubeconfigwriter:v1
+      image: quay.io/diagrawa/kubeconfigwriter:v8
       script: |
-        echo $SECRET_TOKEN
-      env:
-        - name: SECRET_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: cluster-resource-secret
-              key: token
-    - name: get
-      image: quay.io/openshift/origin-cli:latest
-      script: |
-        echo hi
+
+        /kubeconfigwriter \
+          -clusterConfig \
+          '{
+            "name":"$(inputs.params.name)",
+            "type":"cluster",
+            "url":"$(inputs.params.url)",
+            "username":"$(inputs.params.username)",
+            "password":"$(inputs.params.password)",
+            "cadata":"$(inputs.params.cadata)",
+            "clientkeydata":"$(inputs.params.clientkeydata)",
+            "clientcertificatedata":"$(inputs.params.clientcertificatedata)",
+            "namespace":"$(inputs.params.namespace)",
+            "token":"$(inputs.params.token)",
+            "Insecure":$(inputs.params.insecure)
+          }'
+        #echo "(inputs.params.url)" > $(results.kubeconfigfile.path)
+        tail /workspace/$(inputs.params.name)/kubeconfig >> $(results.kubeconfigfile.path)
+        cat $(results.kubeconfigfile.path)
+
