@@ -5,16 +5,18 @@ metadata:
 spec:
   inputs:
     params:
-      - name: kubeconfigfile
-        description: location of the file
+      - name: filename
+        description: file name
         type: string
+  workspaces:
+    - name: kubeconfigfile
+      readOnly: true
   steps:
     - name: get
       image: quay.io/openshift/origin-cli:latest
       script: |
-        export KUBECONFIG="$(inputs.params.kubeconfigfile)"
-        oc config view
-        oc whoami --show-server
+
+        export KUBECONFIG="$(workspaces.kubeconfigfile.path)/$(inputs.params.filename)"
         oc get pods
 
 

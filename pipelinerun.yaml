@@ -5,3 +5,7 @@ metadata:
 spec:
   pipelineRef:
     name: cluster-resource-pipeline
+  workspaces:
+    - name: shared-workspace
+      persistentvolumeclaim:
+        claimName: kubeconfig-pvc

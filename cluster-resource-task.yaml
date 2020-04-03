@@ -46,6 +46,8 @@ spec:
         description: to indicate server should be accessed without verifying the TLS certificate
         type: string
         default: "true"
+  workspaces:
+    - name: kubeconfigfile
   results:
     - name: kubeconfigfile
       description: location of the kubeconfig file
@@ -69,7 +71,5 @@ spec:
             "token":"$(inputs.params.token)",
             "Insecure":$(inputs.params.insecure)
           }'
-        #echo "(inputs.params.url)" > $(results.kubeconfigfile.path)
-        tail /workspace/$(inputs.params.name)/kubeconfig >> $(results.kubeconfigfile.path)
-        cat $(results.kubeconfigfile.path)
+        cp /workspace/$(inputs.params.name)/kubeconfig $(workspaces.kubeconfigfile.path)
 
