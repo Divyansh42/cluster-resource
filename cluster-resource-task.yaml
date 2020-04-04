@@ -1,61 +1,57 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: cluster-resource
+  name: authenticate-cluster
 spec:
-  inputs:
-    params:
-      - name: name
-        description: name of the cluster
-        type: string
-      - name: type
-        description: type of the resource
-        type: string
-        default: cluster
-      - name: url
-        description: address of the cluster
-        type: string
-      - name: username
-        description: username for basic authentication to the cluster
-        type: string
-      - name: password
-        description: password for basic authentication to the cluster
-        type: string
-        default: ""
-      - name: cadata
-        description: contains PEM-encoded certificate authority certificates
-        type: string
-        default: ""
-      - name: clientkeydata
-        description: contains PEM-encoded data from a client key file for TLS
-        type: string
-        default: ""
-      - name: clientcertificatedata
-        description: contains PEM-encoded data from a client cert file for TLS
-        type: string
-        default: ""
-      - name: namespace
-        description: default namespace to use on unspecified requests
-        type: string
-        default: ""
-      - name: token
-        description: bearer token for authentication to the cluster
-        type: string
-        default: ""
-      - name: insecure
-        description: to indicate server should be accessed without verifying the TLS certificate
-        type: string
-        default: "true"
+  params:
+    - name: name
+      description: name of the cluster
+      type: string
+    - name: type
+      description: type of the resource
+      type: string
+      default: cluster
+    - name: url
+      description: address of the cluster
+      type: string
+    - name: username
+      description: username for basic authentication to the cluster
+      type: string
+    - name: password
+      description: password for basic authentication to the cluster
+      type: string
+      default: ""
+    - name: cadata
+      description: contains PEM-encoded certificate authority certificates
+      type: string
+      default: ""
+    - name: clientKeyData
+      description: contains PEM-encoded data from a client key file for TLS
+      type: string
+      default: ""
+    - name: clientCertificateData
+      description: contains PEM-encoded data from a client cert file for TLS
+      type: string
+      default: ""
+    - name: namespace
+      description: default namespace to use on unspecified requests
+      type: string
+      default: ""
+    - name: token
+      description: bearer token for authentication to the cluster
+      type: string
+      default: ""
+    - name: insecure
+      description: to indicate server should be accessed without verifying the TLS certificate
+      type: string
+      default: "true"
   workspaces:
-    - name: kubeconfigfile
-  results:
-    - name: kubeconfigfile
-      description: location of the kubeconfig file
+    - name: kubeconfigFile
   steps:
     - name: write
-      image: quay.io/diagrawa/kubeconfigwriter:v8
+      image: quay.io/diagrawa/kubeconfigwriter:latest
       script: |
-
+        # passing the required json in the form of string.
         /kubeconfigwriter \
           -clusterConfig \
           '{
@@ -65,11 +61,12 @@ spec:
             "username":"$(inputs.params.username)",
             "password":"$(inputs.params.password)",
             "cadata":"$(inputs.params.cadata)",
-            "clientkeydata":"$(inputs.params.clientkeydata)",
-            "clientcertificatedata":"$(inputs.params.clientcertificatedata)",
+            "clientKeyData":"$(inputs.params.clientKeyData)",
+            "clientCertificateData":"$(inputs.params.clientCertificateData)",
             "namespace":"$(inputs.params.namespace)",
             "token":"$(inputs.params.token)",
             "Insecure":$(inputs.params.insecure)
           }'
-        cp /workspace/$(inputs.params.name)/kubeconfig $(workspaces.kubeconfigfile.path)
+        # copy generated kubeconfigFile to workspace "kubeconfigFile" path.
+        cp /workspace/$(inputs.params.name)/kubeconfig $(workspaces.kubeconfigFile.path)
 

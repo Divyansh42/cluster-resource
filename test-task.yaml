@@ -1,22 +1,23 @@
-apiVersion: tekton.dev/v1alpha1
+apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
   name: test-task
 spec:
-  inputs:
-    params:
-      - name: filename
-        description: file name
-        type: string
+  params:
+    - name: filename
+      description: kubeconfig file name
+      type: string
   workspaces:
-    - name: kubeconfigfile
+    - name: kubeconfigFile
       readOnly: true
   steps:
     - name: get
       image: quay.io/openshift/origin-cli:latest
       script: |
 
-        export KUBECONFIG="$(workspaces.kubeconfigfile.path)/$(inputs.params.filename)"
+        export KUBECONFIG="$(workspaces.kubeconfigFile.path)/$(inputs.params.filename)"
+
+        #check that cluster is configured
         oc get pods
 
 
