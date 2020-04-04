@@ -55,18 +55,18 @@ spec:
         /kubeconfigwriter \
           -clusterConfig \
           '{
-            "name":"$(inputs.params.name)",
-            "type":"cluster",
-            "url":"$(inputs.params.url)",
-            "username":"$(inputs.params.username)",
-            "password":"$(inputs.params.password)",
-            "cadata":"$(inputs.params.cadata)",
-            "clientKeyData":"$(inputs.params.clientKeyData)",
-            "clientCertificateData":"$(inputs.params.clientCertificateData)",
-            "namespace":"$(inputs.params.namespace)",
-            "token":"$(inputs.params.token)",
-            "Insecure":$(inputs.params.insecure)
+            "name":"$(params.name)",
+            "type":"$(params.type)",
+            "url":"$(params.url)",
+            "username":"$(params.username)",
+            "password":"$(params.password)",
+            "cadata":"$(params.cadata)",
+            "clientKeyData":"$(params.clientKeyData)",
+            "clientCertificateData":"$(params.clientCertificateData)",
+            "namespace":"$(params.namespace)",
+            "token":"$(params.token)",
+            "Insecure":$(params.insecure)
           }'
         # copy generated kubeconfigFile to workspace "kubeconfigFile" path.
-        cp /workspace/$(inputs.params.name)/kubeconfig $(workspaces.kubeconfigFile.path)
+        cp /workspace/$(params.name)/kubeconfig $(workspaces.kubeconfigFile.path)
 
