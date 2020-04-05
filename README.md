@@ -49,7 +49,7 @@ This will make your HTTPS connections insecure
 
 ## Usage
 
-This task uses a `shared workspace` with `Persistent Volume Claim`. 
+This task uses a `shared workspace` with [`PVC`](https://kubernetes.io/docs/concepts/storage/persistent-volumes). 
 Kubeconfig file is written at `/workspace/<your-cluster-name>/kubeconfig` 
 and then copies this file to the shared workspace in the `kubeconfigFile` directory.
 
