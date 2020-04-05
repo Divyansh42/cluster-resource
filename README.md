@@ -5,8 +5,8 @@ file that can be used to configure access to the different clusters.
 A common use case for this task is to deploy your `application/function` on different clusters.
 
 The task will use the provided parameters to create a `kubeconfig` file that can be used by other steps
-in the pipeline Task to access the target cluster. The kubeconfig will be placed in 
-`/workspace/<your-cluster-name>/kubeconfig` in your Task container.
+in the pipeline task to access the target cluster. The kubeconfig will be placed in 
+`/workspace/<your-cluster-name>/kubeconfig` in your task container.
 
 This task provides variety of ways to authenticate the cluster:
 - Authenticate using tokens.
@@ -55,8 +55,8 @@ and then copies this file to the shared workspace in the `kubeconfigFile` direct
 
 Task can be used with the other task in the pipeline to authenticate the cluster.
 In this example, pipeline has a task `authenticate-cluster` that generates a 
-`kubeconfig file` for the cluster and the `test-task` uses that kubeconfig file and verifies that 
-application has access to the cluster or not by using some `kubectl/oc` commands.
+`kubeconfig file` for the cluster and the `test-task` uses that kubeconfig file and verifies that the
+application has the access to the cluster or not by using some `kubectl/oc` commands.
 
 ```
 apiVersion: tekton.dev/v1beta1
@@ -98,6 +98,7 @@ spec:
         - authenticate-cluster
 ```
 
+
 `Test-task` uses shared-workspace and fetch kubeconfig file form the
 kubeconfigFile directory and use oc commands to check whether the `cluster` is configured or not.
 
@@ -124,6 +125,7 @@ spec:
         #check that the cluster is configured
         oc get pods
 ```
+
 Workspace with `PVC` is used, which is as shown below.
 ```
 apiVersion: v1
@@ -138,6 +140,7 @@ spec:
   accessModes:
     - ReadWriteOnce
    ```
+   
    Finally, Pipelinerun is used to execute the tasks in the pipeline and get the results.
    ```
    apiVersion: tekton.dev/v1beta1
