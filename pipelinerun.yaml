@@ -1,10 +1,10 @@
 apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: cluster-resource-pipeline-run
+  name: kubeconfig-test-pipeline-run
 spec:
   pipelineRef:
-    name: cluster-resource-pipeline
+    name: kubeconfig-test-pipeline
   workspaces:
     - name: shared-workspace
       persistentvolumeclaim:

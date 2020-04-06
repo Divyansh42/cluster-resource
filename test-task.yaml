@@ -1,7 +1,7 @@
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: test-task
+  name: authentication-test
 spec:
   params:
     - name: filename
@@ -16,8 +16,6 @@ spec:
       script: |
 
         export KUBECONFIG="$(workspaces.kubeconfigFile.path)/$(inputs.params.filename)"
-
-        #check that cluster is configured
+        #
+        # check that the cluster is configured
         oc get pods
-
-
