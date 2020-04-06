@@ -1,14 +1,14 @@
-# Authenticate Cluster Task
+# Cluster Authentication Task
 
 This task creates a [kubeconfig](https://kubernetes.io/docs/tasks/access-application-cluster/configure-access-multiple-clusters/)
 file that can be used to configure access to the different clusters.
 A common use case for this task is to deploy your `application/function` on different clusters.
 
 The task will use the provided parameters to create a `kubeconfig` file that can be used by other steps
-in the pipeline task to access the target cluster. The kubeconfig will be placed in 
-`/workspace/<your-cluster-name>/kubeconfig` in your task container.
+in the pipeline task to access the target cluster. The kubeconfig will be placed at 
+`/workspace/kubeconfigFile/kubeconfig`.
 
-This task provides variety of ways to authenticate the cluster:
+This task provides users variety of ways to authenticate:
 - Authenticate using tokens.
 - Authenticate using client key and client certificates.
 
@@ -16,7 +16,7 @@ This task provides variety of ways to authenticate the cluster:
 ## Install the Task
 
 ```
-kubectl create -f https://raw.githubusercontent.com/Divyansh42/catalog/divyanshu/cluster/cluster/cluster-resource.yaml
+kubectl apply -f https://raw.githubusercontent.com/tektoncd/catalog/v1beta1/cluster/cluster-authentication.yaml
 ```
 
 ## Inputs
@@ -55,21 +55,21 @@ and then copies this file to the shared workspace in the `kubeconfigFile` direct
 
 Task can be used with the other task in the pipeline to authenticate the cluster.
 In this example, pipeline has a task `authenticate-cluster` that generates a 
-`kubeconfig file` for the cluster and the `test-task` uses that kubeconfig file and verifies that the
-application has the access to the cluster or not by using some `kubectl/oc` commands.
+`kubeconfig file` for the cluster and the `test-task` uses that kubeconfig file and verifiy whether the
+application has an access to the cluster or not by using some `kubectl/oc` commands.
 
 ```
 apiVersion: tekton.dev/v1beta1
 kind: Pipeline
 metadata:
-  name: cluster-resource-pipeline
+  name: cluster-authentication-pipeline
 spec:
   workspaces:
     - name: shared-workspace
   tasks:
-    - name: authenticate-cluster
+    - name: cluster-authentication
       taskRef:
-        name: authenticate-cluster
+        name: cluster-authentication
       workspaces:
         - name: kubeconfigFile
           workspace: shared-workspace
@@ -79,15 +79,14 @@ spec:
         - name: username
           value: admin
         - name: url
-          value: https://api.ci-ln-72n71c2-d5d6b.origin-ci-int-aws.dev.rhcloud.com:6443
+          value: https://api.ci-ln-dgx7m7b-d5d6b.origin-ci-int-aws.dev.rhcloud.com:6443
         - name: clientCertificateData
-          value: LS0tLS1CRUdJTiBDRVJ.....
+          value: LS0tLS1....
         - name: clientKeyData
-          value: LS0tLS1CRUdJTiBDRVJ.....
-
-    - name: test-task
+          value: LS0tLS1....
+    - name: authentication-test
       taskRef:
-        name: test-task
+        name: authentication-test
       workspaces:
         - name: kubeconfigFile
           workspace: shared-workspace
@@ -95,18 +94,18 @@ spec:
         - name: filename
           value: kubeconfig
       runAfter:
-        - authenticate-cluster
+        - cluster-authentication
 ```
 
 
-`Test-task` uses shared-workspace and fetch kubeconfig file form the
-kubeconfigFile directory and use oc commands to check whether the `cluster` is configured or not.
+`Test-task` uses shared-workspace to fetch the kubeconfig file form the
+kubeconfigFile directory and uses oc commands to check whether the `cluster` is configured or not.
 
 ```
 apiVersion: tekton.dev/v1beta1
 kind: Task
 metadata:
-  name: test-task
+  name: authentication-test
 spec:
   params:
     - name: filename
@@ -126,7 +125,7 @@ spec:
         oc get pods
 ```
 
-Workspace with `PVC` is used, which is as shown below.
+Workspace with `PVC` is used, as shown below.
 ```
 apiVersion: v1
 kind: PersistentVolumeClaim
@@ -141,18 +140,19 @@ spec:
     - ReadWriteOnce
    ```
    
-   Finally, Pipelinerun is used to execute the tasks in the pipeline and get the results.
-   ```
-   apiVersion: tekton.dev/v1beta1
+ Finally, Pipelinerun is used to execute the tasks in the pipeline and get the results.
+ ```
+apiVersion: tekton.dev/v1beta1
 kind: PipelineRun
 metadata:
-  name: cluster-resource-pipeline-run
+  name: cluster-authentication-pipeline-run
 spec:
   pipelineRef:
-    name: cluster-resource-pipeline
+    name: cluster-authentication-pipeline
   workspaces:
     - name: shared-workspace
       persistentvolumeclaim:
         claimName: kubeconfig-pvc
+
 ```
    
