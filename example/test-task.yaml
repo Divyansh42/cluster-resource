@@ -8,14 +8,14 @@ spec:
       description: kubeconfig file name
       type: string
   workspaces:
-    - name: kubeconfigFile
+    - name: input
       readOnly: true
   steps:
     - name: get
       image: quay.io/openshift/origin-cli:latest
       script: |
 
-        export KUBECONFIG="$(workspaces.kubeconfigFile.path)/$(inputs.params.filename)"
+        export KUBECONFIG="$(workspaces.input.path)/$(inputs.params.filename)"
         #
         # check that the cluster is configured
         oc get pods
