@@ -69,7 +69,7 @@ In this example, pipeline has a task `kubeconfig-creator` that generates a
 `kubeconfig file` for the cluster and the `test-task` uses that kubeconfig file and verifiy whether the
 application has an access to the cluster or not by using some `kubectl/oc` commands.
 
-Required params can be passed in the pipeline as follows:
+Required `params` can be passed in the pipeline as follows:
 
 ```
 params:
@@ -119,11 +119,11 @@ spec:
     - ReadWriteOnce
    ```
 
- Finally, Pipelinerun is used to execute the tasks in the pipeline and get the results.
- Reference for sample pipelinerun can be found [here](../kubeconfig-creator/example/pipelinerun.yaml).
+ Finally, PipelineRun is used to execute the tasks in the pipeline and get the results.
+ Reference for sample PipelineRun can be found [here](../kubeconfig-creator/example/pipelinerun.yaml).
  
 ***NOTE***
 
-- Since only one authentication technique is allowed per user, either a `token` or a `password` should be provided, if both are provided, the password will be ignored.
+- Since only one `authentication` technique is allowed per user, either a `token` or a `password` should be provided, if both are provided, the password will be ignored.
 
 - `clientKeyData` and `clientCertificateData` are only required if `token` or `password` is not provided for authentication to cluster.
